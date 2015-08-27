@@ -27,13 +27,17 @@ var connect_to_db = function (host, port, dbname, cb) {
 module.exports = function ReportDatabase (output) {
   // ---------------------------------------------------------------------------
   // private attributes
-  var connection = null;
+  var connection  = null;
   var reportModel = null;
+  var gridfs      = null;
 
   var self = this;
 
   // ---------------------------------------------------------------------------
   // private functions
+  var ensure_callback = function (cb) {
+    return _.isFunction(cb) ? cb : function () {return;};
+  };
   var is_connected = function () {
     if (!connection) {
         return false;
@@ -58,8 +62,9 @@ module.exports = function ReportDatabase (output) {
       output('disconnecting...');
       connection.close();
     }
-    connection = null;
+    connection  = null;
     reportModel = null;
+    gridfs      = null;
   };
   this.connect = function (host, port, dbname, cb) {
     this.disconnect();
@@ -76,6 +81,7 @@ module.exports = function ReportDatabase (output) {
       initReportModel(conn);
       connection = conn;
       reportModel = conn.model('ReportModel');
+      gridfs = new Grid(connection.db, mongoose.mongo);
       cb();
     });
   };
@@ -94,6 +100,29 @@ module.exports = function ReportDatabase (output) {
     this.reportModel.findOneAndUpdate(_query_obj, {$set: _update_obj}, {upsert: true}, function (err, doc) {
       cb(err, doc);
     });
+  };
+  this.removeReportDocument = function (report_path, report_name, cb) {
+    if (!is_connection_valid(cb)) {
+      return;
+    }
+    this.reportModel.remove({'report-name': report_name, 'report-path': report_path}, cb);
+  };
+  this.setTemplatePath = function (report_path, report_name, template_path, cb) {
+    cb = ensure_callback(cb);
+    if (!is_connection_valid(cb)) {
+      return;
+    }
+    var _query_obj = {'report-name': report_name, 'report-path': report_path};
+    var _update_obj = {'template': {'path': template_path, 'valid': true}};
+    this.reportModel.findOneAndUpdate(_query_obj, {$set: _update_obj}, {upsert: true}, function (err) {
+      cb(err);
+    });
+  };
+  this.isDataFileExisted = function (fname, cb) {
+    if (!is_connection_valid(cb)) {
+      return;
+    }
+    this.gridfs
   };
 
 
