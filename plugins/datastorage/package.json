@@ -1,0 +1,12 @@
+{
+  "name": "dataStorage",
+  "version": "0.0.1",
+  "main": "datastorage.js",
+  "private": true,
+  
+  "plugin": {
+    "consumes": ["reportConfig", "commUtils"],
+    "provides": ["dataStorage"]
+  }
+}
+

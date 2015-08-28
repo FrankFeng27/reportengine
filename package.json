@@ -11,7 +11,6 @@
     "assert": "*",
     "async": "*",
     "body-parser": "~1.0.0",
-    "buffer": "*",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^0.8.0",
     "convict": "^0.6.1",

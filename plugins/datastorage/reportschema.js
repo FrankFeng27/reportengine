@@ -43,8 +43,8 @@ exports.initReportModel = function (conn) {
     'template': { 'path': {type: String, default: ''}, 'valid': {type: Boolean, default: false} },
     'version': String,
     'report-setting': ReportSettingSchema,
-    'image-fields': [ImageFieldSchema],
-    'editable-fields': [EditableFieldSchema],
+    'image-field': [ImageFieldSchema],
+    'editable-field': [EditableFieldSchema],
     'meta-data': {modified: {type: Date, default: Date.now()}, created: {type: Date, default: Date.now()}}
   });
   

@@ -1,0 +1,11 @@
+{
+  "name": "commUtils",
+  "version": "0.0.1",
+  "main": "commutils.js",
+  "private": true,
+  
+  "plugin": {
+    "provides": ["commUtils"]
+  }
+}
+
