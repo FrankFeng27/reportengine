@@ -57,18 +57,39 @@ module.exports = {
     _temp_obj[_key] = val;
     return true;
   },
-  normalizeDataFileName: function (name) {
+  normalizeFileName: function (name) {
     return name.replace(/\\/g, '/');
   },
-  joinDataFileName: function () {
+  joinFileName: function () {
     var join = path.join;
     var _out = join.apply(path, arguments);
-    return normalizeDataFileName(_out);  
+    return this.normalizeFileName(_out);  
   },
   getDataFileChunkSize: function (fsize) {
     var default_chunk_size = 255 * 1024;
     var _size = (parseInt(fsize/1024) + 1) * 1024;
     return _size < default_chunk_size ? default_chunk_size : _size;
+  },
+  // return directive path like this: /xxx/yyy/zzz/
+  convertDirPath: function (dir_path) {
+    // check edge case
+    if (!dir_path || dir_path.length === 0) {
+      return '/';
+    }
+    // 1. normalize
+    var _out = this.normalizeFileName(dir_path);
+    // 2. Make sure slashs at both ends
+    if (_out[0] !== '/') {
+      _out = '/' + _out;
+    } 
+    if (_out[_out.length-1] !== '/') {
+      _out += '/';
+    }
+    return _out;
+  },
+  // build macro path: join(report_path, report_name, field_type, eid, macro_path)
+  buildMacroPath: function (rpt_path, rpt_name, field_type, eid, macro_path) {
+    return this.joinFileName(rpt_path, rpt_name, field_type, eid, macro_path);
   }
 };
 
