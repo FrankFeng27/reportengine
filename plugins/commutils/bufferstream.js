@@ -17,7 +17,7 @@ function BufferStream( source ) {
   this._offset = 0;
   this._length = source.length; 
   // When the stream has ended, try to clean up the memory references.
-  this.on( "end", this._destroy ); 
+  this.on( "end", this._destroy.bind(this) ); 
 }
  
 util.inherits( BufferStream, stream.Readable ); 

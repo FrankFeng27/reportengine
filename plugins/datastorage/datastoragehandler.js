@@ -53,6 +53,34 @@ var update_image_field = function (imgField, oldTPLName, curTPLName, db, cb) {
   });
 };
 
+var need_remove_image_field = function (docImagesPath, imgField) {
+  // Check if image is in document folder
+  if (!imgField.path || imgField.path.length === 0) {
+    return false;
+  }
+  if (imgField.path.length < docImagesPath.length) {
+    return false;
+  }
+  if (imgField.path.slice(0, docImagesPath.length) !== docImagesPath) {
+    return false;
+  }
+  return true;
+};
+
+var remove_image_field = function (doc, imgField, db, cb) {
+  var _doc_full_path = reportDatabaseUtils.joinFileName(doc['report-path'], doc['report-name']);
+  var _doc_images_path = reportDatabaseUtils.joinFileName(_doc_full_path, 'images');
+
+  var _macro_path = reportDatabaseUtils.buildMacroPath(doc['report-path'], doc['report-name'], 'image-field', imgField.id, imgField.macro);
+  db.removeDataFile(_macro_path, function () {
+    if (!need_remove_image_field(_doc_images_path, imgField)) {
+      cb();
+      return;
+    }
+    db.removeDataFile(reportDatabaseUtils.joinFileName(imgField.path, imgField.name), cb);
+  });
+};
+
 var dataStorageHandler = {
   saveDocumentAs: function (srcDocPath, srcDocName, dstDocPath, dstDocName, db, done) {
     var self = this;
@@ -63,7 +91,7 @@ var dataStorageHandler = {
         });
       }, function (src_doc, callback) {
         // Check if dst document existed, if not, create one
-        db.findReport(_dst_doc_path, dstDocName, function (err, doc) {
+        db.findReport(dstDocPath, dstDocName, function (err, doc) {
           if (err) {
             callback(err);
             return;
@@ -71,7 +99,7 @@ var dataStorageHandler = {
           if (doc) {
             callback(err, src_doc, doc);
           } else {
-            db.createReportDocument(_dst_doc_path, dstDocName, function (err, doc) {              
+            db.createReportDocument(dstDocPath, dstDocName, function (err, doc) {              
               callback(err, src_doc, doc);
             });
           }
@@ -95,8 +123,9 @@ var dataStorageHandler = {
       dstDoc['editable-field'].push(item);
     });
 
-    var _make_update_image_field_func = function (imgFieldId, imgField) {
+    var _make_update_image_field_func = function (imgField) {
       return function (cb) {
+        var imgFieldId = imgField.id;
         var _src_macro_path = reportDatabaseUtils.buildMacroPath(srcDoc['report-path'], srcDoc['report-name'], 'image-field', imgFieldId, imgField.macro);
         var _dst_macro_path = reportDatabaseUtils.buildMacroPath(dstDoc['report-path'], dstDoc['report-name'], 'image-field', imgFieldId, imgField.macro);
 
@@ -109,7 +138,36 @@ var dataStorageHandler = {
         });
       };
     };
+
+    var _funcs = [];
+    _.each(dstDoc['image-field'], function (item) {
+      _funcs.push(_make_update_image_field_func(item));
+    });
+    async.series(_funcs, function () {
+      db.saveDocument(dstDoc, 'image-field');
+      update_doc_modified(dstDoc);
+      done();
+    });
+  },
+  removeDocument: function (doc, db, cb) {
+    
+    var _make_remove_iamge_field_func = function (imgField) {
+      return function(cb) {
+        remove_image_field(doc, imgField, db, cb);
+      };
+    };
+
+    var _funcs = [];
+    _.each(doc['image-field'], function (item) {
+      _funcs.push(_make_remove_iamge_field_func(item));
+    });
+
+    async.each(_funcs, function () {
+      db.removeReportDocument(doc['report-path'], doc['report-name'], cb);
+    });
   }
 };
+
+module.exports = dataStorageHandler;
 
 
