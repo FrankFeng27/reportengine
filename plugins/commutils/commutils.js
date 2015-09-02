@@ -26,7 +26,7 @@ module.exports = function setup (options, imports, register) {
         return cb;
       }
       return function () {};
-    }
+    },
     BufferStream: BufferStream
   };
 

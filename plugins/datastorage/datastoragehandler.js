@@ -4,7 +4,7 @@
 
 var async = require('async');
 var _ = require('underscore');
-var reportDatabaseUtils = require('reportdatabaseutils');
+var reportDatabaseUtils = require('./reportdatabaseutils');
 
 var update_doc_modified = function (doc) {
   if (!doc) {

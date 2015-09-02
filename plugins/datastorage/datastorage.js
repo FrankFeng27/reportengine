@@ -1,11 +1,11 @@
 
-/* jshing node: true */
+/* jshint node: true */
 "use strict";
 
 var fs = require('fs');
-var async = require('async');
 var ReportDatabase = require('./reportdatabase');
 var reportDatabaseUtils = require('./reportdatabaseutils');
+var dataStorageHandler = require('./datastoragehandler');
 
 module.exports = function setup (options, imports, register) {
   // dependency
@@ -21,7 +21,7 @@ module.exports = function setup (options, imports, register) {
     var self = this;
 
     // private functions
-    var connect_to_db = function () {
+    var connect_to_db = function (cb) {
       if (!self.reportDB) {
         cb(new Error('Database was not initialized.'));
         return;
@@ -69,13 +69,20 @@ module.exports = function setup (options, imports, register) {
       }
       if (doc) {
         doc['report-setting'] = {'report-name': "", 'template-name': "", 'model-path': "", 'is-template': false};
-        this.reportDB.saveReportDocument(doc, 'report-setting', cb);
+        this.reportDB.saveReportDocument(doc, 'report-setting', function (err) {
+          if (err) {
+            handleError(err);
+            cb(err);
+            return;
+          }
+          cb(null, doc);
+        });
       } else {
-        cb();
+        cb(null, doc);
       }
     });
   };
-  DataStorage.prototype.createTemplateDocument = function (rptpath, rptName, cb) {
+  DataStorage.prototype.createTemplateDocument = function (rptPath, rptName, cb) {
     cb = validateCallback(cb);
     this.reportDB.createReportDocument(rptPath, rptName, function (err, doc) {
       if (err) {
@@ -85,23 +92,34 @@ module.exports = function setup (options, imports, register) {
       }
       if (doc) {
         doc['report-setting'] = {'report-name': "", 'template-name': "", 'model-path': "", 'is-template': true};
-        this.reportDB.saveReportDocument(doc, 'report-setting', cb);
+        this.reportDB.saveReportDocument(doc, 'report-setting', function (err) {
+          if (err) {
+            handleError(err);
+            cb(err);
+            return;
+          }
+          cb(null, doc);
+        });
       } else {
-        cb();
+        cb(null, doc);
       }
     });
   };
   DataStorage.prototype.saveData = function (rptPath, rptName, data_name, data_value, cb) {
+    cb = validateCallback(cb);
     this.reportDB.saveReportData(rptPath, rptName, data_name, data_value, cb);
   };
   DataStorage.prototype.getData = function (rptPath, rptName, data_name, cb) {
+    cb = validateCallback(cb);
     this.reportDB.getReportData(rptPath, rptName, data_name, cb);
   };
   DataStorage.prototype.isDataFileExisted = function (fpath, fname, cb) {
+    cb = validateCallback(cb);
     var _joined_name = reportDatabaseUtils.joinFileName(fpath, fname);
     this.reportDB.isDataFileExisted(_joined_name, cb);
   };
   DataStorage.prototype.saveFileAsDataFile = function (srcFile, dataFilePath, dataFileName, cb) {
+    cb = validateCallback(cb);
     var _joined_name = reportDatabaseUtils.joinFileName(dataFilePath, dataFileName);
     var _stat = fs.statSync(srcFile);
     if (!_stat.isFile()) {
@@ -116,59 +134,91 @@ module.exports = function setup (options, imports, register) {
     this.reportDB.saveStreamToDataFile(_read_stream, _joined_name, _chunk_size, cb);
   };
   DataStorage.prototype.saveContentAsDataFile = function (content, fpath, fname, cb) {
+    cb = validateCallback(cb);
     var _joined_name = reportDatabaseUtils.joinFileName(fpath, fname);
     var _buf = new Buffer(content);
     var _stream_buf = new BufferStream(_buf);
     this.reportDB.saveStreamToDataFile(_stream_buf, _joined_name, 0, cb);
   };
   DataStorage.prototype.getDataFile = function (fpath, fname, cb) {
+    cb = validateCallback(cb);
     var _joined_name = reportDatabaseUtils.joinFileName(fpath, fname);
     this.reportDB.getDataFile(_joined_name, cb);
   };
   DataStorage.prototype.collectReports = function (cb) {
+    cb = validateCallback(cb);
     this.reportDB.collectReportDocuments(cb);
   };
   DataStorage.prototype.setTemplatePath = function (rptPath, rptName, tPath, cb) {
+    cb = validateCallback(cb);
     this.reportDB.setTemplatePath(rptPath, rptName, tPath, cb);
   };
   DataStorage.prototype.findReport = function (rptPath, rptName, cb) {
+    cb = validateCallback(cb);
     this.reportDB.findReportDocument(rptPath, rptName, cb);
   };
   DataStorage.prototype.save_document_as = function (srcDocPath, srcDocName, dstDocPath, dstDocName, done) {
-    var _dst_doc_path = reportDatabaseUtils.convertDirPath(dstDocPath);
-    done = validateCallback(done);
-    var self = this;
-    async.waterfall([function (callback) {
-      // 1. find source document
-      self.reportDB.findReport(srcDocPath, srcDocName, function (err, doc) {
-        if (err) {
-          handleError(err);
-        }
-        callback(err, doc);
-      });
-    }, function (src_doc, callback) {
-      // Check if dst document existed, if not, create one
-      self.reportDB.findReport(_dst_doc_path, dstDocName, function (err, doc) {
-        if (err) {
-          handleError(err);
-          callback(err);
-          return;
-        }
-        if (doc) {
-          callback(err, src_doc, doc);
-        } else {
-          self.reportDB.createReportDocument(_dst_doc_path, dstDocName, function (err, doc) {
-            if (err) {
-              handleError(err);
-            }
-            callback(err, src_doc, doc);
-          });
-        }
-      });
-    }, function (src_doc, dst_doc, callback) {
-      self.
-    }]);
+    dataStorageHandler.saveDocumentAs(srcDocPath, srcDocName, dstDocPath, dstDocName, this.reportDB, done);
   };
+  DataStorage.prototype.saveTemplateAsTemplate = function (rptPath, rptName, tplPath, tplName, cb) {
+    cb = validateCallback(cb);
+    var _tpl_path = reportDatabaseUtils.convertDirPath(tplPath);
+    var _tpl_name = tplName;
+    var self = this;
+    this.save_document_as(rptPath, rptName, _tpl_path, _tpl_name, function (err, srcDoc, dstDoc) {
+      if (err) {
+        handleError(err);
+        cb(err);
+        return;
+      }
+      // mark dstDoc as report
+      dstDoc['report-setting']['is-template'] = true;
+      self.reportDB.saveReportDocument(dstDoc, 'report-setting', function () {});
+
+      cb(err, srcDoc, dstDoc);
+    });
+  };
+  DataStorage.prototype.saveTemplateAsReport = function (rptPath, rptName, rptPathSave, rptNameSave, cb) {
+    cb = validateCallback(cb);
+    var _rpt_path = reportDatabaseUtils.convertDirPath(rptPathSave);
+    var _rpt_name = rptNameSave;
+    var self = this;
+    this.save_document_as(rptPath, rptName, _rpt_path, _rpt_name, function (err, srcDoc, dstDoc) {
+      if (err) {
+        handleError(err);
+        cb(err);
+        return;
+      }
+      // mark dstDoc as report
+      dstDoc['report-setting']['is-template'] = false;
+      self.reportDB.saveReportDocument(dstDoc, 'report-setting', function () {});
+
+      cb(err, srcDoc, dstDoc);
+    });
+  };
+  DataStorage.prototype.removeReport = function (rptPath, rptName, cb) {
+    cb = validateCallback(cb);
+    var self = this;
+    this.reportDB.findReport(rptPath, rptName, function (err, doc) {
+      if (err) {
+        handleError(err);
+        cb(err);
+        return;
+      }
+      if (!doc) {
+        cb();
+        return;
+      }
+      dataStorageHandler.removeDocument(doc, self.reportDB, cb);
+    });
+  };
+  
+  var _data_storage = new DataStorage();
+  _data_storage.connect(function () {
+    register(null, {
+        dataStorage: _data_storage
+    });
+  });
 };
 
 

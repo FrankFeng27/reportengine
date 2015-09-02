@@ -25,16 +25,16 @@ exports.initReportModel = function (conn) {
 
   var EditableFieldSchema = new Schema({
     'id': String,
-    'content': String
+    'content': String,
     'aux-data': Schema.Types.Mixed
   }, {strict: false});
 
-  var ReportSettingSchema  = new Schema {
+  var ReportSettingSchema  = new Schema ({
     'report-name': String,   // report name which will run template to save as report
     'template-name': String, // template name which will be saved as template
     'model-path': String,    // related model path 
     'is-template': Boolean   // is template?
-  };
+  });
 
   // Foundation Schema
   var ReportSchema = new Schema({
