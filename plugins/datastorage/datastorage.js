@@ -11,6 +11,7 @@ module.exports = function setup (options, imports, register) {
   // dependency
   var reportConfig = imports.reportConfig;
   var handleError = imports.commUtils.handleError;
+  var outputMessage = imports.commUtils.outputMessage;
   var validateCallback = imports.commUtils.validateCallback;
   var BufferStream = imports.commUtils.BufferStream;
   
@@ -34,7 +35,7 @@ module.exports = function setup (options, imports, register) {
       self.reportDB.connect(mongodb.host, mongodb.port, mongodb.dbname, cb);
     };
     var initialize = function () {
-      self.reportDB = new ReportDatabase();
+      self.reportDB = new ReportDatabase(outputMessage);
     };
 
     // public functions
@@ -61,6 +62,8 @@ module.exports = function setup (options, imports, register) {
   };
   DataStorage.prototype.createReportDocument = function (rptPath, rptName, cb) {
     cb = validateCallback(cb);
+    rptPath = reportDatabaseUtils.convertDirPath(rptPath);
+    var self = this;
     this.reportDB.createReportDocument(rptPath, rptName, function (err, doc) {
       if (err) {
         handleError(err);
@@ -69,7 +72,7 @@ module.exports = function setup (options, imports, register) {
       }
       if (doc) {
         doc['report-setting'] = {'report-name': "", 'template-name': "", 'model-path': "", 'is-template': false};
-        this.reportDB.saveReportDocument(doc, 'report-setting', function (err) {
+        self.reportDB.saveReportDocument(doc, 'report-setting', function (err) {
           if (err) {
             handleError(err);
             cb(err);
@@ -84,6 +87,7 @@ module.exports = function setup (options, imports, register) {
   };
   DataStorage.prototype.createTemplateDocument = function (rptPath, rptName, cb) {
     cb = validateCallback(cb);
+    rptPath = reportDatabaseUtils.convertDirPath(rptPath);
     this.reportDB.createReportDocument(rptPath, rptName, function (err, doc) {
       if (err) {
         handleError(err);
@@ -92,7 +96,7 @@ module.exports = function setup (options, imports, register) {
       }
       if (doc) {
         doc['report-setting'] = {'report-name': "", 'template-name': "", 'model-path': "", 'is-template': true};
-        this.reportDB.saveReportDocument(doc, 'report-setting', function (err) {
+        self.reportDB.saveReportDocument(doc, 'report-setting', function (err) {
           if (err) {
             handleError(err);
             cb(err);
@@ -107,10 +111,12 @@ module.exports = function setup (options, imports, register) {
   };
   DataStorage.prototype.saveData = function (rptPath, rptName, data_name, data_value, cb) {
     cb = validateCallback(cb);
+    rptPath = reportDatabaseUtils.convertDirPath(rptPath);
     this.reportDB.saveReportData(rptPath, rptName, data_name, data_value, cb);
   };
   DataStorage.prototype.getData = function (rptPath, rptName, data_name, cb) {
     cb = validateCallback(cb);
+    rptPath = reportDatabaseUtils.convertDirPath(rptPath);
     this.reportDB.getReportData(rptPath, rptName, data_name, cb);
   };
   DataStorage.prototype.isDataFileExisted = function (fpath, fname, cb) {
@@ -151,10 +157,12 @@ module.exports = function setup (options, imports, register) {
   };
   DataStorage.prototype.setTemplatePath = function (rptPath, rptName, tPath, cb) {
     cb = validateCallback(cb);
+    rptPath = reportDatabaseUtils.convertDirPath(rptPath);
     this.reportDB.setTemplatePath(rptPath, rptName, tPath, cb);
   };
   DataStorage.prototype.findReport = function (rptPath, rptName, cb) {
     cb = validateCallback(cb);
+    rptPath = reportDatabaseUtils.convertDirPath(rptPath);
     this.reportDB.findReportDocument(rptPath, rptName, cb);
   };
   DataStorage.prototype.save_document_as = function (srcDocPath, srcDocName, dstDocPath, dstDocName, done) {
@@ -162,6 +170,7 @@ module.exports = function setup (options, imports, register) {
   };
   DataStorage.prototype.saveTemplateAsTemplate = function (rptPath, rptName, tplPath, tplName, cb) {
     cb = validateCallback(cb);
+    rptPath = reportDatabaseUtils.convertDirPath(rptPath);
     var _tpl_path = reportDatabaseUtils.convertDirPath(tplPath);
     var _tpl_name = tplName;
     var self = this;
@@ -180,6 +189,7 @@ module.exports = function setup (options, imports, register) {
   };
   DataStorage.prototype.saveTemplateAsReport = function (rptPath, rptName, rptPathSave, rptNameSave, cb) {
     cb = validateCallback(cb);
+    rptPath = reportDatabaseUtils.convertDirPath(rptPath);
     var _rpt_path = reportDatabaseUtils.convertDirPath(rptPathSave);
     var _rpt_name = rptNameSave;
     var self = this;
@@ -198,6 +208,7 @@ module.exports = function setup (options, imports, register) {
   };
   DataStorage.prototype.removeReport = function (rptPath, rptName, cb) {
     cb = validateCallback(cb);
+    rptPath = reportDatabaseUtils.convertDirPath(rptPath);
     var self = this;
     this.reportDB.findReport(rptPath, rptName, function (err, doc) {
       if (err) {

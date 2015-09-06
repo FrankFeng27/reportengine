@@ -32,6 +32,7 @@ var mockup_imports = {
   commUtils: {
     handleError: function (err) {},
     validateCallback: function (cb) { return cb ? cb : function () {}; },
+    outputMessage: function (msg) { console.log(String(msg)); },
     BufferStream: ReadableStream
   },
   reportConfig: {
@@ -48,11 +49,11 @@ var mockup_imports = {
 describe('dataStorage', function () {
   var dataStorage = null;
   var originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 1500000; // extend timeout
 
   beforeAll(function (done) {
     setup(null, mockup_imports, function (options, regObj) {
-      dataStorage = regObj.dataStorage;
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = 1500000; // extend timeout
+      dataStorage = regObj.dataStorage;      
       done();
     });
   });

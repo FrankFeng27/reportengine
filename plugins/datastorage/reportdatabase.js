@@ -179,6 +179,17 @@ module.exports = function ReportDatabase (output) {
     var _query_obj = {'report-name': report_name, 'report-path': report_path};
     var _update_obj = {'image-field': [], 'editable-field': [], 'meta-data': {modified: Date.now()}};
     reportModel.findOneAndUpdate(_query_obj, {$set: _update_obj}, {upsert: true}, function (err, doc) {
+      if (err) {
+        cb(err);
+        return;
+      }
+      // If document does not exist, it will be created, but doc would be null, so we need to find.
+      if (!doc) {
+        self.findReportDocument(report_path, report_name, function (err, doc) {
+          cb(err, doc);
+        });
+        return;
+      }
       cb(err, doc);
     });
   };

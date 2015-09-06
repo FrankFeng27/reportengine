@@ -20,7 +20,7 @@ exports.initReportModel = function (conn) {
     'macro': String,
     'path': String,
     'field-type': {type: String, default: 'image-field'},
-    'aux-data': Shema.Types.Mixed
+    'aux-data': Schema.Types.Mixed
   }, {strict: false});
 
   var EditableFieldSchema = new Schema({
@@ -29,12 +29,12 @@ exports.initReportModel = function (conn) {
     'aux-data': Schema.Types.Mixed
   }, {strict: false});
 
-  var ReportSettingSchema  = new Schema ({
-    'report-name': String,   // report name which will run template to save as report
-    'template-name': String, // template name which will be saved as template
-    'model-path': String,    // related model path 
-    'is-template': Boolean   // is template?
-  });
+  /// var ReportSettingSchema  = new Schema ({
+  ///   'report-name': String,   // report name which will run template to save as report
+  ///   'template-name': String, // template name which will be saved as template
+  ///   'model-path': String,    // related model path 
+  ///   'is-template': Boolean   // is template?
+  /// });
 
   // Foundation Schema
   var ReportSchema = new Schema({
@@ -42,7 +42,12 @@ exports.initReportModel = function (conn) {
     'report-path': String,
     'template': { 'path': {type: String, default: ''}, 'valid': {type: Boolean, default: false} },
     'version': String,
-    'report-setting': ReportSettingSchema,
+    'report-setting': {
+      'report-name': String,   // report name which will run template to save as report
+      'template-name': String, // template name which will be saved as template
+      'model-path': String,    // related model path 
+      'is-template': Boolean   // is template?
+    },
     'image-field': [ImageFieldSchema],
     'editable-field': [EditableFieldSchema],
     'meta-data': {modified: {type: Date, default: Date.now()}, created: {type: Date, default: Date.now()}}
