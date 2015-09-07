@@ -32,6 +32,10 @@ BufferStream.prototype._destroy = function() {
   this._length = null; 
 };
 
+BufferStream.prototype.end = function () {};
+
+BufferStream.prototype.write = function () {};
+
 // I read chunks from the source buffer into the underlying stream buffer.
 // --
 // NOTE: We can assume the size value will always be available since we are not

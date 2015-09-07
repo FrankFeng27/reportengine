@@ -31,11 +31,11 @@ describe('BufferStream', function () {
     var _test_str = "An antipattern is just like a pattern, except that instead of a solution it gives something that looks superficially like a solution but isn't one.-- Andrew Koenig";
     var _buf = new Buffer(_test_str);
     var _bufStream = new BufferStream(_buf);
-    var _writeStream = fs.createWritableStream('d:/temp/test-111.log', 'w');
+    var _writeStream = fs.createWriteStream('d:/temp/test-111.log', 'w');
     /// var _writeStream = new WritableMemoryStream();
     _bufStream.pipe(_bufStream);
     _writeStream.on('close', function () {
-      var _out = String(_writeStream.buf);
+///      var _out = String(_writeStream.buf);
       /// expect(_out).toBe(_test_str);
       console.log('BufferStream test completed.')
     });
