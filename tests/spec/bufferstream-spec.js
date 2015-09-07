@@ -18,26 +18,27 @@ util.inherits(WritableMemoryStream, Writable);
 WritableMemoryStream.prototype._write = function (chunk, enc, cb) {
   var buffer = Buffer.isBuffer(chunk) ? chunk : new Buffer(chunk, enc);
 
-  Buffer.concat(this.buf, buffer);
+  this.buf = Buffer.concat([this.buf, buffer]);
   cb();
 };
 
-/// WritableMemoryStream.prototype.toString = function () {
-///   return this.buf.toString();
-/// };
+WritableMemoryStream.prototype.toString = function () {
+  return this.buf.toString();
+};
 
 describe('BufferStream', function () {
   it('should test BufferStream', function () {
     var _test_str = "An antipattern is just like a pattern, except that instead of a solution it gives something that looks superficially like a solution but isn't one.-- Andrew Koenig";
-    var _buf = new Buffer(_test_str);
-    var _bufStream = new BufferStream(_buf);
+    /// var _buf = new Buffer(_test_str);
+    var _bufStream = new BufferStream(_test_str);
     var _writeStream = fs.createWriteStream('d:/temp/test-111.log', 'w');
     /// var _writeStream = new WritableMemoryStream();
-    _bufStream.pipe(_bufStream);
+    _bufStream.pipe(_writeStream);
     _writeStream.on('close', function () {
-///      var _out = String(_writeStream.buf);
-      /// expect(_out).toBe(_test_str);
-      console.log('BufferStream test completed.')
+      /// 
+      /// var _out = _writeStream.toString();
+      /// expect(_out).toBe(_test_str+'.');
+      console.log('BufferStream test completed.');
     });
   });
 });

@@ -78,6 +78,7 @@ describe('dataStorage', function () {
     dataStorage.createReportDocument(_path, _name, function (err, doc) {
       expect(doc['report-path']).toBe('/temp/test/');
       expect(doc['report-name']).toBe('foo1.tpl');
+      done();
     });
   });
 
