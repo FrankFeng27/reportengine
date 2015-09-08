@@ -1,0 +1,10 @@
+{
+  "name": "reportConfig",
+  "version": "0.0.1",
+  "main": "reportconfig.js",
+  "private": true,
+  
+  "plugin": {
+    "provides": ["reportConfig"]
+  }
+}

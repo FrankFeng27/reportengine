@@ -1,0 +1,12 @@
+{
+  "name": "templateManager",
+  "version": "0.0.1",
+  "main": "templatemanager.js",
+  "private": true,
+  
+  "plugin": {
+    "consumes": ["reportConfig", "commUtils"],
+    "provides": ["templateManager"]
+  }
+}
+

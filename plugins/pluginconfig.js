@@ -17,12 +17,9 @@ var path = require('path');
 // -----------------------------------------------------------------------------
 
 module.exports = [
-  './commutils',
   {packagePath: './config', 'config-path': path.join(__dirname, '../config.json')},
-  './datastorage',
-  './tfsdataaccessor',
-  './tfsdatasync',
-  './datamanipulator'
+  './commutils',
+  './datastorage'
 ]
 
 
