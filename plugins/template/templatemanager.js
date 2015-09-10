@@ -17,9 +17,13 @@ module.exports = function setup (options, imports, register) {
   var TemplateManager = function () {
     var self = this;
 
-    this.collectTemplates = function (tplPath, cb) {
-      collectFolders(tplPath, cb);
+    // cb (err, baseTemplates)
+    this.collectBaseTemplates = function (baseTplPath, cb) {
+      collectFolders(basePath, cb);
     };
+
+    this.createTemplateFromBase = function (baseTplPath, cb) {};
+
 
   };
 

@@ -16,7 +16,7 @@ describe('reportConfig', function () {
     var _mongodbCfg = reportConfig.get('mongodb');
     expect(_mongodbCfg.host).toBe('localhost');
     expect(_mongodbCfg.port).toBe(27017);
-    expect(_mongodbCfg.dbname).toBe('DTK-Report');
+    expect(_mongodbCfg.dbname).toBe('ReportEngine');
     reportConfig.set('')
     done();
   });

@@ -2,7 +2,7 @@
   "mongodb": {
     "host": "localhost",
     "port": 27017,
-    "dbname": "DTK-Report"
+    "dbname": "ReportEngine"
   },
   "phantomjs": {
     "path": "./3rdapps/phantomjs-2.0.0-windows/bin/phantomjs.exe",

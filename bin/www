@@ -1,0 +1,10 @@
+/* jshint node: true */
+"use strict";
+
+var ReportEngine = require('../app');
+
+var reportEngine = new ReportEngine();
+
+reportEngine.initialize(function () {
+  reportEngine.start(function () {});
+});
