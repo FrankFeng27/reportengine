@@ -27,6 +27,11 @@ module.exports = function setup (options, imports, register) {
 
   };
 
+  var _tplManager = new TemplateManager();
+  register(null, {
+    templateManager: _tplManager
+  });
+
 };
 
 
