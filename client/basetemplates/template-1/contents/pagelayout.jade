@@ -1,0 +1,59 @@
+doctype html
+html
+  head
+    meta(charset="UTF-8")
+    title= title
+    link(rel='stylesheet' href='/css/bootstrap.css')
+    link(rel='stylesheet' href='/public/stylesheets/stylesheet.css')
+    link(rel='stylesheet' href='/public/stylesheets/common-stylesheets.css')
+    link(rel='stylesheet' href='/#{template_path}/public/stylesheets/stylesheet.css')
+    block styles
+
+  body
+    .container-fluid
+      .edp-header
+        nav.navbar.navbar-default.navbar-bordered
+          .navbar-header
+            a.navbar-brand(href="/")
+              img(alt="EDPub" src="/public/images/EDP_logo.png")
+          .navbar-header
+            h2 Analysis Report
+      #content
+        .edp-content.row(style="height: 100%;")
+          .col-md-2(style="padding: 0; height: 100%;")
+            .sidebar-nav
+              ul.nav.nav-pills.nav-stacked(role="tablist")
+                li.nav-header Contents
+                each page, ix in page_array
+                  li.active(id="uid_#{page.page_name}" role="presentation")
+                    a.nav-page(href="#{page.page_url}") #{page.page_name}
+
+          .col-md-10.tab-content(style="padding: 0; height: 100%;")
+            block content
+        .edp-ftr-drawer
+          if state === "fillTemplate"
+            include ../../../views/ftr-ft-drawer-taskbar.jade
+          else if state == "viewReport"
+            include ../../../views/ftr-vr-drawer-taskbar.jade
+    block dialogs
+
+      
+      
+  script(type="text/javascript", src='/jquery.js')
+  script(type="text/javascript", src='/bootstrap.js')
+  script(type="text/javascript", src='/underscore.js')
+  script(type="text/javascript", src='/public/javascripts/common-scripts.js')
+  script(type="text/javascript", src='/public/javascripts/footerdrawer.js')
+  script(type="text/javascript").
+    (function(rptData) {
+      rptData.templatePrefix = "#{template_path}";
+      rptData.reportName = "#{report_name}";
+      rptData.reportPath = "#{report_path}";
+      rptData.state = "#{state}";
+    })(reportData);
+  script(type="text/javascript", src='/public/javascripts/collectimagefield.js')
+  script(type="text/javascript", src='/#{template_path}/public/javascripts/tabswitch.js')
+  
+  block scripts
+  
+
