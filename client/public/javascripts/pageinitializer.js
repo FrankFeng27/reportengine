@@ -3,7 +3,13 @@
 
 "use strict";
 
+$(function () {
+  // global variables
+  var _rptData = reportData;
 
-
-
+  // initialize image-field
+  $('.image-field').each(function (ix, elem) {
+    _rptData.imageField.init(elem);
+  });
+});
 
