@@ -39,7 +39,12 @@
       });
     };
 
-    var getEditableFieldData = function () {};
+    var getEditableFieldData = function (element, cb) {
+      var _rpt_name = rptData.reportName;
+      var _rpt_path = rptData.reportPath;
+      var _id = $(element).attr('id');
+
+    };
 
   };
 
