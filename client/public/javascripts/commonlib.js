@@ -5,6 +5,7 @@ var reportData = {
   "report-name": null,
   "report-path": null,
   state: "invalid", // candidate value: invalid, fillTemplate, runTemplate, viewReport
+  utils: null,
   imageField: null
 };
 
