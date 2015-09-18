@@ -27,7 +27,8 @@ ReportEngine.prototype.init_resource = function (done) {
 
   // static resource
   /// this.app.use(express.static(__dirname));
-  this.app.use(express.static(path.join(__dirname, './client/entry/public')));
+  this.app.use(express.static(path.join(__dirname, './client/public')));
+  this.app.use(express.static(path.join(__dirname, './client/entry/resources')));
   this.app.use(express.static(path.join(__dirname, 'node_modules')));
   this.app.use(express.static(path.join(__dirname, 'bower_components/jquery/dist')));
   this.app.use(express.static(path.join(__dirname, 'bower_components/bootstrap/dist/js')));
