@@ -11,5 +11,10 @@ $(function () {
   $('.image-field').each(function (ix, elem) {
     _rptData.imageField.init(elem);
   });
+
+  // initialize editable-field
+  $('.editable-field').each(function (ix, elem) {
+    _rptData.editableField.init(elem);
+  });
 });
 
