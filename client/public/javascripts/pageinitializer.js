@@ -4,17 +4,25 @@
 "use strict";
 
 $(function () {
-  // global variables
-  var _rptData = reportData;
+  
+  // private function
+  var initializePage = function (rptData, $) {
+    // initialize image-field
+    if (rptData.imageField) {
+      $('.image-field').each(function (ix, elem) {
+        rptData.imageField.init(elem);
+      });
+    }
+  
+    // initialize editable-field
+    if (rptData.editableField) {
+      $('.editable-field').each(function (ix, elem) {
+        rptData.editableField.init(elem);
+      });
+    }
+  };
 
-  // initialize image-field
-  $('.image-field').each(function (ix, elem) {
-    _rptData.imageField.init(elem);
-  });
-
-  // initialize editable-field
-  $('.editable-field').each(function (ix, elem) {
-    _rptData.editableField.init(elem);
-  });
+  initializePage(reportData, jQuery);
+  
 });
 

@@ -132,44 +132,48 @@ var SprintTableCreator = function (_, $) {
         return "work-item-noassoc-color";
       }
     };
-    var get_userstory_status_class = function (us) {
+    var get_userstory_status_and_class = function (us) {
       if (!us || !us.status) {
-        return "table-usrstory-other-cell";
+        return ["Unknown", "table-userstory-other-cell"];
       }
       if (us.status === "Active") {
-        return "table-usrstory-active-cell";
+        return ["Active", "table-userstory-active-cell"];
       }
       if (us.status === "Resolved") {
-        return "table-usrstory-resolved-cell";
+        return ["Resolved", "table-userstory-resolved-cell"];
       }
       if (us.status === "Tested") {
-        return "table-usrstory-tested-cell";
+        return ["Tested", "table-userstory-tested-cell"];
       }
       if (us.status === "Closed") {
-        return "table-usrstory-closed-cell";
+        return ["Closed", "table-userstory-closed-cell"];
+      }
+      if (us.status === "New") {
+        return ["New", "table-userstory-other-cell"];
       }
 
-      return "table-usrstory-other-cell";
+      return ["unknown", "table-userstory-other-cell"];
     };
 
     var create_userstory_row = function (us, changeset_arr, build_obj_arr) {
       var $tr = $('<tr></tr>');
       // template string
-      var _us_tpl = _.template(['<td class="table-userstory-cell {{status_class}}"><div class="userstory-description">',
+      var _us_tpl = _.template(['<td class="table-userstory-cell"><div class="userstory-description {{status_class}}">',
         '<a href="#" data-userstory="{{userstory_id}}">',
         '<div class="work-item-color {{work_item_class}}">&nbsp;</div>', 
-        '<span class="userstory-id-block">[{{userstory_id}}]</span><span class="userstory-description-block">{{userstory_description}}</span>',
+        '<span class="userstory-id-block">[{{userstory_id}} | {{userstory_status}}]</span><span class="userstory-description-block">{{userstory_description}}</span>',
         '</a></div></td>'].join(''));
       
       var _work_item_class = get_userstory_work_item_class(us);
-      var _status_class = get_userstory_status_class(us);
+      var _status_and_class = get_userstory_status_and_class(us);
       var _us_description  = (us.type !== "User Story" && us.type !== "Bug") ? "No User Stroy Associated" : us.description;
       
       // the first cell of this row
       $tr.append(_us_tpl({userstory_id: us.id, 
         userstory_description: _us_description, 
-        work_item_class: _work_item_class, 
-        status_class: _status_class}));
+        work_item_class: _work_item_class,
+        userstory_status: _status_and_class[0], 
+        status_class: _status_and_class[1]}));
 
       if (!build_obj_arr || build_obj_arr.length === 0) {
         return $tr;

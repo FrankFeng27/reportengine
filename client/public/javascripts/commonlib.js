@@ -6,7 +6,8 @@ var reportData = {
   "report-path": null,
   state: "invalid", // candidate value: invalid, fillTemplate, runTemplate, viewReport
   utils: null,
-  imageField: null
+  imageField: null,
+  editableField: null
 };
 
 (function (rptData, us) {
